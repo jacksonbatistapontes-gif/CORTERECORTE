@@ -63,6 +63,13 @@ class ClipJobCreate(BaseModel):
     language: Optional[str] = "pt"
     style: Optional[str] = "dinamico"
 
+
+class ClipUpdate(BaseModel):
+    title: Optional[str] = None
+    caption: Optional[str] = None
+    start_time: Optional[int] = Field(default=None, ge=0)
+    end_time: Optional[int] = Field(default=None, ge=1)
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
@@ -162,6 +169,30 @@ async def advance_job(job_id: str):
     )
     updated = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
     return serialize_job(updated)
+
+
+@api_router.patch("/jobs/{job_id}/clips/{clip_id}", response_model=ClipSegment)
+async def update_clip(job_id: str, clip_id: str, payload: ClipUpdate):
+    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job não encontrado")
+    clips = job.get("clips", [])
+    clip = next((item for item in clips if item.get("id") == clip_id), None)
+    if not clip:
+        raise HTTPException(status_code=404, detail="Corte não encontrado")
+    update_data = payload.model_dump(exclude_unset=True)
+    if "start_time" in update_data or "end_time" in update_data:
+        start = update_data.get("start_time", clip.get("start_time"))
+        end = update_data.get("end_time", clip.get("end_time"))
+        if end <= start:
+            raise HTTPException(status_code=400, detail="Tempo final deve ser maior")
+        update_data["duration"] = end - start
+    clip.update(update_data)
+    await db.clip_jobs.update_one(
+        {"id": job_id},
+        {"$set": {"clips": clips}},
+    )
+    return ClipSegment(**clip)
 
 # Include the router in the main app
 app.include_router(api_router)
