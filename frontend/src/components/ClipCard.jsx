@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Play } from "lucide-react";
+import { Download, Pencil, Play } from "lucide-react";
 import { toast } from "sonner";
 
-export const ClipCard = ({ clip, onPreview, onDownload }) => {
+export const ClipCard = ({ clip, onPreview, onDownload, onEdit }) => {
   const handlePreview = () => {
     if (onPreview) {
       onPreview(clip);
@@ -58,7 +58,7 @@ export const ClipCard = ({ clip, onPreview, onDownload }) => {
           {clip.start_time}s → {clip.end_time}s · {clip.duration}s
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Button
           onClick={handlePreview}
           className="flex-1 bg-white/10 hover:bg-white/20"
@@ -73,6 +73,15 @@ export const ClipCard = ({ clip, onPreview, onDownload }) => {
         >
           <Download size={16} /> Baixar
         </Button>
+        {onEdit && (
+          <Button
+            onClick={() => onEdit(clip)}
+            className="col-span-2 bg-white/5 hover:bg-white/10"
+            data-testid={`clip-edit-button-${clip.id}`}
+          >
+            <Pencil size={16} /> Editar corte
+          </Button>
+        )}
       </div>
     </Card>
   );
