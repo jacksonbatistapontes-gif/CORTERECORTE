@@ -94,7 +94,17 @@ def serialize_job(job: dict) -> ClipJob:
     if isinstance(job.get("created_at"), str):
         job["created_at"] = datetime.fromisoformat(job["created_at"])
     if isinstance(job.get("clips"), list):
-        job["clips"] = [ClipSegment(**clip) for clip in job.get("clips", [])]
+        # Filter out incomplete clips and only include valid ones
+        valid_clips = []
+        for clip in job.get("clips", []):
+            try:
+                # Check if clip has all required fields
+                if all(field in clip for field in ['id', 'title', 'start_time', 'end_time', 'duration', 'viral_score', 'thumbnail_url', 'caption', 'video_url']):
+                    valid_clips.append(ClipSegment(**clip))
+            except Exception as e:
+                # Skip invalid clips
+                continue
+        job["clips"] = valid_clips
     return ClipJob(**job)
 
 def media_url(path: Path) -> str:
