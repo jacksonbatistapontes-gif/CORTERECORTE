@@ -328,8 +328,16 @@ export default function Create() {
                     data-testid={`studio-job-${job.id}`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-white/60">{job.title}</div>
-                      <Badge className="bg-white/10 text-white">
+                    <div
+                      className="text-sm text-white/60"
+                      data-testid={`studio-job-title-${job.id}`}
+                    >
+                      {job.title}
+                    </div>
+                      <Badge
+                        className="bg-white/10 text-white"
+                        data-testid={`studio-job-status-${job.id}`}
+                      >
                         {job.status === "completed" ? "Completo" : "Processando"}
                       </Badge>
                     </div>
