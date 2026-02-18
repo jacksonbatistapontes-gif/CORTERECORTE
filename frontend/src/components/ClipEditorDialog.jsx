@@ -10,16 +10,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+import { resolveMediaUrl } from "@/lib/media";
 
-export const ClipEditorDialog = ({ clip, open, onOpenChange, onSave }) => {
+export const ClipEditorDialog = ({ clip, job, open, onOpenChange, onSave }) => {
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [range, setRange] = useState([0, 0]);
 
   const maxRange = useMemo(() => {
+    if (job?.duration) return job.duration;
     if (!clip) return 120;
     return Math.max(clip.end_time + 60, 120);
-  }, [clip]);
+  }, [clip, job]);
+
+  const highlight = useMemo(() => {
+    if (!job?.duration) return { left: "0%", width: "0%" };
+    const left = (range[0] / job.duration) * 100;
+    const width = ((range[1] - range[0]) / job.duration) * 100;
+    return { left: `${left}%`, width: `${width}%` };
+  }, [range, job]);
 
   useEffect(() => {
     if (!clip) return;
@@ -70,6 +79,46 @@ export const ClipEditorDialog = ({ clip, open, onOpenChange, onSave }) => {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
+          {job?.waveform_url && (
+            <div className="flex flex-col gap-2" data-testid="clip-editor-waveform-section">
+              <div className="text-xs text-white/60" data-testid="clip-editor-waveform-label">
+                Waveform do áudio
+              </div>
+              <div className="relative rounded-2xl overflow-hidden border border-white/10">
+                <img
+                  src={resolveMediaUrl(job.waveform_url)}
+                  alt="Waveform"
+                  className="w-full object-cover"
+                  data-testid="clip-editor-waveform-image"
+                />
+                <div
+                  className="absolute top-0 bottom-0 bg-[var(--e1-secondary)]/20 border border-[var(--e1-secondary)]"
+                  style={highlight}
+                  data-testid="clip-editor-waveform-highlight"
+                />
+              </div>
+            </div>
+          )}
+          {job?.sprite_url && (
+            <div className="flex flex-col gap-2" data-testid="clip-editor-sprite-section">
+              <div className="text-xs text-white/60" data-testid="clip-editor-sprite-label">
+                Thumbnails por frame
+              </div>
+              <div className="relative rounded-2xl overflow-hidden border border-white/10">
+                <img
+                  src={resolveMediaUrl(job.sprite_url)}
+                  alt="Frames"
+                  className="w-full object-cover"
+                  data-testid="clip-editor-sprite-image"
+                />
+                <div
+                  className="absolute top-0 bottom-0 bg-[var(--e1-primary)]/15 border border-[var(--e1-primary)]"
+                  style={highlight}
+                  data-testid="clip-editor-sprite-highlight"
+                />
+              </div>
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <label className="text-sm text-white/70" data-testid="clip-editor-name-label">
               Título do corte
