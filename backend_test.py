@@ -110,7 +110,7 @@ class ClipCutterAPITester:
             return False
         
         print(f"\n🔄 Advancing job {self.job_id} to completion...")
-        max_attempts = 10
+        max_attempts = 15  # Increased attempts for real video processing
         attempts = 0
         
         while attempts < max_attempts:
@@ -125,8 +125,14 @@ class ClipCutterAPITester:
             if status == "completed":
                 print(f"✅ Job completed with {len(response.get('clips', []))} clips")
                 return True
+            elif status == "error":
+                print(f"❌ Job failed with error: {response.get('error_message', 'Unknown error')}")
+                return False
             
             attempts += 1
+            # Add delay for real processing
+            import time
+            time.sleep(2)
         
         print(f"❌ Job did not complete after {max_attempts} attempts")
         return False
@@ -181,11 +187,7 @@ class ClipCutterAPITester:
             return False
         finally:
             self.tests_run += 1
-    print("🚀 Starting ClipCutter API Tests")
-    print("=" * 50)
-    
-    tester = ClipCutterAPITester()
-    
+
 def main():
     print("🚀 Starting ClipCutter API Tests")
     print("=" * 50)
