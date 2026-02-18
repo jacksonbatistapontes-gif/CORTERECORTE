@@ -357,14 +357,15 @@ async def update_clip(job_id: str, clip_id: str, payload: ClipUpdate):
         update_data["duration"] = end - start
         video_url = clip.get("video_url")
         thumb_url = clip.get("thumbnail_url")
+        source_path = VIDEO_DIR / f"{job_id}.mp4"
+        if not source_path.exists():
+            raise HTTPException(status_code=400, detail="Arquivo fonte não encontrado")
         if video_url:
             clip_path = STORAGE_DIR / video_url.replace("/media/", "")
-            source_path = VIDEO_DIR / f"{job_id}.mp4"
             await asyncio.to_thread(render_clip, source_path, clip_path, start, end - start)
         if thumb_url:
             thumb_path = STORAGE_DIR / thumb_url.replace("/media/", "")
-            source_path = VIDEO_DIR / f"{job_id}.mp4"
-            await asyncio.to_thread(render_thumbnail, source_path, thumb_path, start + 1)
+            await asyncio.to_thread(render_thumbnail, source_path, thumb_path, max(0, start + 1))
     clip.update(update_data)
     await db.clip_jobs.update_one(
         {"id": job_id},
