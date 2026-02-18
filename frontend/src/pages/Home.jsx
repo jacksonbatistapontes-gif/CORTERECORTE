@@ -191,8 +191,8 @@ export default function Home() {
         <section className="section-padding">
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="flex flex-col gap-4">
-              <h2 className="font-[Outfit] text-3xl" data-testid="how-title">
-                Como funciona no estilo OpnusClips
+            <h2 className="font-[Outfit] text-3xl" data-testid="how-title">
+                Como funciona no estilo Cortes&Recorte
               </h2>
               <p className="text-white/70" data-testid="how-subtitle">
                 Um fluxo direto e rápido para transformar seu conteúdo em uma máquina de
