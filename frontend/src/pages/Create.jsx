@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { ClipCard } from "@/components/ClipCard";
-import { createJob, listJobs, advanceJob } from "@/lib/api";
+import { createJob, listJobs, getJob, advanceJob } from "@/lib/api";
 import { toast } from "sonner";
 import { Scissors, Sparkles, Timer } from "lucide-react";
 
@@ -49,13 +49,13 @@ export default function Create() {
   }, []);
 
   useEffect(() => {
-    if (!currentJob || currentJob.status === "completed") {
+    if (!currentJob || ["completed", "error"].includes(currentJob.status)) {
       return undefined;
     }
     let cancelled = false;
     const interval = setInterval(async () => {
       try {
-        const updated = await advanceJob(currentJob.id);
+        const updated = await getJob(currentJob.id);
         if (cancelled) return;
         setCurrentJob(updated);
         setJobs((prev) => {
@@ -65,6 +65,9 @@ export default function Create() {
         });
         if (updated.status === "completed") {
           toast.success("Cortes prontos para revisão!");
+        }
+        if (updated.status === "error") {
+          toast.error("Falha no processamento. Verifique o link do YouTube.");
         }
       } catch (error) {
         toast.error("Falha ao atualizar o progresso.");
@@ -97,6 +100,17 @@ export default function Create() {
       toast.error("Não foi possível iniciar o processamento.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!currentJob) return;
+    try {
+      const updated = await advanceJob(currentJob.id);
+      setCurrentJob(updated);
+      toast.success("Reprocessamento iniciado.");
+    } catch (error) {
+      toast.error("Não foi possível reprocessar.");
     }
   };
 
@@ -272,7 +286,9 @@ export default function Create() {
                 <span data-testid="studio-progress-hint">
                   {currentJob.status === "completed"
                     ? "Cortes prontos para revisão"
-                    : "Analisando momentos-chave"}
+                    : currentJob.status === "error"
+                      ? "Falha no processamento"
+                      : "Analisando momentos-chave"}
                 </span>
               </div>
               {currentJob.status === "completed" && (
@@ -291,6 +307,20 @@ export default function Create() {
                     onClick={() => setCurrentJob(null)}
                   >
                     Criar novo corte
+                  </Button>
+                </div>
+              )}
+              {currentJob.status === "error" && (
+                <div className="flex flex-wrap gap-4">
+                  <div className="text-sm text-red-300" data-testid="studio-error-text">
+                    {currentJob.error_message || "Erro ao processar o vídeo."}
+                  </div>
+                  <Button
+                    onClick={handleRetry}
+                    className="pill-button bg-[var(--e1-secondary)] text-black"
+                    data-testid="studio-retry-button"
+                  >
+                    Tentar novamente
                   </Button>
                 </div>
               )}
