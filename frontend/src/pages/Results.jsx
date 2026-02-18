@@ -213,6 +213,7 @@ export default function Results() {
       <Footer />
       <ClipEditorDialog
         clip={editingClip}
+        job={job}
         open={editorOpen}
         onOpenChange={setEditorOpen}
         onSave={handleSaveEdit}
