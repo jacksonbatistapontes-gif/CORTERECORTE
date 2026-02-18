@@ -18,6 +18,11 @@ export const getJob = async (jobId) => {
   return data;
 };
 
+export const getJobClips = async (jobId) => {
+  const { data } = await axios.get(`${API}/jobs/${jobId}/clips`);
+  return data;
+};
+
 export const advanceJob = async (jobId) => {
   const { data } = await axios.post(`${API}/jobs/${jobId}/advance`);
   return data;
