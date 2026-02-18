@@ -142,16 +142,33 @@ export default function Home() {
                   </div>
                   <div className="mt-4 flex flex-col gap-3">
                     <div className="flex items-center justify-between text-sm" data-testid="hero-preview-row-1">
-                      <span>Detecção de ganchos</span>
-                      <span className="text-[var(--e1-secondary)]">98%</span>
+                      <span data-testid="hero-preview-row-1-label">Detecção de ganchos</span>
+                      <span
+                        className="text-[var(--e1-secondary)]"
+                        data-testid="hero-preview-row-1-value"
+                      >
+                        98%
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm" data-testid="hero-preview-row-2">
-                      <span>Legenda automática</span>
-                      <span className="text-[var(--e1-secondary)]">Ativa</span>
+                      <span data-testid="hero-preview-row-2-label">Legenda automática</span>
+                      <span
+                        className="text-[var(--e1-secondary)]"
+                        data-testid="hero-preview-row-2-value"
+                      >
+                        Ativa
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm" data-testid="hero-preview-row-3">
-                      <span>Formatação Reels/TikTok</span>
-                      <span className="text-[var(--e1-secondary)]">9:16</span>
+                      <span data-testid="hero-preview-row-3-label">
+                        Formatação Reels/TikTok
+                      </span>
+                      <span
+                        className="text-[var(--e1-secondary)]"
+                        data-testid="hero-preview-row-3-value"
+                      >
+                        9:16
+                      </span>
                     </div>
                   </div>
                 </div>
