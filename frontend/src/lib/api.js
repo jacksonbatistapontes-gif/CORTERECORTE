@@ -27,3 +27,8 @@ export const advanceJob = async (jobId) => {
   const { data } = await axios.post(`${API}/jobs/${jobId}/advance`);
   return data;
 };
+
+export const updateClip = async (jobId, clipId, payload) => {
+  const { data } = await axios.patch(`${API}/jobs/${jobId}/clips/${clipId}`, payload);
+  return data;
+};
