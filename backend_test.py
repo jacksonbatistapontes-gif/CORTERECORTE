@@ -164,6 +164,8 @@ def main():
         ("Get Job Clips", tester.test_get_job_clips),
         ("Advance to Completion", tester.test_advance_to_completion),
         ("Final Get Job Clips", tester.test_get_job_clips),
+        ("Update Clip", tester.test_update_clip),
+        ("Verify Updated Clip", tester.test_get_job_clips),
     ]
     
     for test_name, test_func in tests:
