@@ -3,15 +3,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Pencil, Play } from "lucide-react";
 import { toast } from "sonner";
+import { resolveMediaUrl } from "@/lib/media";
 
 export const ClipCard = ({ clip, onPreview, onDownload, onEdit }) => {
+  const thumbnailUrl = resolveMediaUrl(clip.thumbnail_url);
+  const videoUrl = resolveMediaUrl(clip.video_url);
   const handlePreview = () => {
     if (onPreview) {
       onPreview(clip);
       return;
     }
-    toast("Prévia simulada", {
-      description: "A prévia abriria o corte em um player dedicado.",
+    if (videoUrl) {
+      window.open(videoUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    toast("Prévia indisponível", {
+      description: "O corte ainda não possui vídeo gerado.",
     });
   };
 
@@ -20,8 +27,12 @@ export const ClipCard = ({ clip, onPreview, onDownload, onEdit }) => {
       onDownload(clip);
       return;
     }
-    toast("Download simulado", {
-      description: "O arquivo final estaria disponível aqui.",
+    if (videoUrl) {
+      window.open(videoUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    toast("Download indisponível", {
+      description: "O corte ainda não possui vídeo gerado.",
     });
   };
 
@@ -32,7 +43,7 @@ export const ClipCard = ({ clip, onPreview, onDownload, onEdit }) => {
     >
       <div className="relative">
         <img
-          src={clip.thumbnail_url}
+          src={thumbnailUrl}
           alt={clip.title}
           className="w-full h-40 object-cover rounded-xl"
           data-testid={`clip-thumbnail-${clip.id}`}
