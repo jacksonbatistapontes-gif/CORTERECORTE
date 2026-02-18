@@ -262,18 +262,20 @@ async def create_job(payload: ClipJobCreate):
     job = ClipJob(
         youtube_url=payload.youtube_url,
         title="Importação do YouTube",
-        status="processing",
+        status="queued",
         progress=0,
         clip_count=0,
         clips=[],
         clip_length=payload.clip_length,
         language=payload.language or "pt",
         style=payload.style or "dinamico",
+        error_message=None,
     )
     doc = job.model_dump()
     doc["created_at"] = doc["created_at"].isoformat()
     doc["clips"] = [clip.model_dump() for clip in job.clips]
     await db.clip_jobs.insert_one(doc)
+    asyncio.create_task(process_job(job.id, payload.youtube_url, payload.clip_length))
     return job
 
 
@@ -319,23 +321,20 @@ async def get_job_clips(job_id: str):
 async def advance_job(job_id: str):
     job = await db.clip_jobs.find_one(
         {"id": job_id},
-        {"_id": 0, "progress": 1, "status": 1, "clips": 1, "clip_length": 1},
+        {
+            "_id": 0,
+            "progress": 1,
+            "status": 1,
+            "clips": 1,
+            "clip_length": 1,
+            "youtube_url": 1,
+        },
     )
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
-    progress = job.get("progress", 0)
-    status = job.get("status", "processing")
-    clips = job.get("clips", [])
-    if status != "completed":
-        progress = min(100, progress + random.randint(18, 36))
-        status = "completed" if progress >= 100 else "processing"
-        if status == "completed" and not clips:
-            generated = generate_clips(job.get("clip_length", 30))
-            clips = [clip.model_dump() for clip in generated]
-    await db.clip_jobs.update_one(
-        {"id": job_id},
-        {"$set": {"progress": progress, "status": status, "clips": clips, "clip_count": len(clips)}},
-    )
+    status = job.get("status", "queued")
+    if status in ["queued", "error"]:
+        asyncio.create_task(process_job(job_id, job.get("youtube_url", ""), job.get("clip_length", 30)))
     updated = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
     return serialize_job(updated)
 
@@ -356,6 +355,16 @@ async def update_clip(job_id: str, clip_id: str, payload: ClipUpdate):
         if end <= start:
             raise HTTPException(status_code=400, detail="Tempo final deve ser maior")
         update_data["duration"] = end - start
+        video_url = clip.get("video_url")
+        thumb_url = clip.get("thumbnail_url")
+        if video_url:
+            clip_path = STORAGE_DIR / video_url.replace("/media/", "")
+            source_path = VIDEO_DIR / f"{job_id}.mp4"
+            await asyncio.to_thread(render_clip, source_path, clip_path, start, end - start)
+        if thumb_url:
+            thumb_path = STORAGE_DIR / thumb_url.replace("/media/", "")
+            source_path = VIDEO_DIR / f"{job_id}.mp4"
+            await asyncio.to_thread(render_thumbnail, source_path, thumb_path, start + 1)
     clip.update(update_data)
     await db.clip_jobs.update_one(
         {"id": job_id},
