@@ -104,13 +104,33 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-6">
-                  <div className="glass-card px-4 py-3" data-testid="hero-metric-1">
-                    <div className="text-sm text-white/60">Tempo médio</div>
-                    <div className="font-[Outfit] text-xl">4 min</div>
+                <div className="glass-card px-4 py-3" data-testid="hero-metric-1">
+                    <div
+                      className="text-sm text-white/60"
+                      data-testid="hero-metric-1-label"
+                    >
+                      Tempo médio
+                    </div>
+                    <div
+                      className="font-[Outfit] text-xl"
+                      data-testid="hero-metric-1-value"
+                    >
+                      4 min
+                    </div>
                   </div>
                   <div className="glass-card px-4 py-3" data-testid="hero-metric-2">
-                    <div className="text-sm text-white/60">Cortes gerados</div>
-                    <div className="font-[Outfit] text-xl">+6 por vídeo</div>
+                    <div
+                      className="text-sm text-white/60"
+                      data-testid="hero-metric-2-label"
+                    >
+                      Cortes gerados
+                    </div>
+                    <div
+                      className="font-[Outfit] text-xl"
+                      data-testid="hero-metric-2-value"
+                    >
+                      +6 por vídeo
+                    </div>
                   </div>
                 </div>
               </div>
