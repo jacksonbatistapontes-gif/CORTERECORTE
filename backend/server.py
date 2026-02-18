@@ -383,7 +383,7 @@ async def get_job_clips(job_id: str):
 
 @api_router.get("/jobs/{job_id}/download")
 async def download_job(job_id: str):
-    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0, "clips": 1})
+    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0, "clips": 1, "waveform_url": 1, "sprite_url": 1})
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     clips = job.get("clips", [])
@@ -403,6 +403,16 @@ async def download_job(job_id: str):
                 thumb_path = STORAGE_DIR / thumb_url.replace("/media/", "")
                 if thumb_path.exists():
                     zipf.write(thumb_path, arcname=f"thumbs/{thumb_path.name}")
+        waveform_url = job.get("waveform_url")
+        sprite_url = job.get("sprite_url")
+        if waveform_url:
+            waveform_path = STORAGE_DIR / waveform_url.replace("/media/", "")
+            if waveform_path.exists():
+                zipf.write(waveform_path, arcname="timeline/waveform.png")
+        if sprite_url:
+            sprite_path = STORAGE_DIR / sprite_url.replace("/media/", "")
+            if sprite_path.exists():
+                zipf.write(sprite_path, arcname="timeline/sprite.jpg")
     return FileResponse(zip_path, filename=f"cortes-{job_id}.zip")
 
 
