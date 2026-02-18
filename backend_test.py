@@ -9,6 +9,7 @@ class ClipCutterAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.job_id = None
+        self.clip_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None):
         """Run a single API test"""
