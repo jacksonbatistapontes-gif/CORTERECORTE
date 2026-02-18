@@ -15,6 +15,7 @@ crie site para cortes de videos curtos a partir de videos do youtube, com funç�
 - Página de resultados com cards de clipes, score viral e ações de download/preview
 - Editor manual para ajustar título, legenda e intervalo do corte
 - Pipeline real: download YouTube, geração de clipes, thumbnails, URLs de mídia e pacote ZIP
+- Editor com timeline visual (waveform + sprite de frames)
 - API: criar jobs, listar, obter, avançar progresso e listar clipes
 - Brand atualizado para Corte&Recorte
 - Arquivos de VPS: docker-compose.yml, Dockerfiles e nginx.conf + README
