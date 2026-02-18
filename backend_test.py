@@ -186,6 +186,12 @@ class ClipCutterAPITester:
     
     tester = ClipCutterAPITester()
     
+def main():
+    print("🚀 Starting ClipCutter API Tests")
+    print("=" * 50)
+    
+    tester = ClipCutterAPITester()
+    
     # Test sequence
     tests = [
         ("Root Endpoint", tester.test_root_endpoint),
