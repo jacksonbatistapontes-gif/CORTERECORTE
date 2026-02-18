@@ -1,4 +1,4 @@
-# Cortes&Recorte
+# Corte&Recorte
 
 Plataforma web para gerar cortes curtos a partir de vídeos do YouTube.
 

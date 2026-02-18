@@ -1,7 +1,7 @@
-# PRD — Cortes&Recorte
+# PRD — Corte&Recorte
 
 ## Problema original
-crie site para cortes de videos curtos a partir de videos do youtube, com funções semelhantes ao site opnusclips. Preferência: faça conforme o opnus clipes. Atualização: nome da aplicação deve ser Cortes&Recorte e pronta para VPS.
+crie site para cortes de videos curtos a partir de videos do youtube, com funções semelhantes ao site opnusclips. Preferência: faça conforme o opnus clipes. Atualização: nome da aplicação deve ser Corte&Recorte e pronta para VPS.
 
 ## Decisões de arquitetura
 - Frontend: React + Tailwind + shadcn/ui + sonner para toasts
@@ -14,7 +14,7 @@ crie site para cortes de videos curtos a partir de videos do youtube, com funç�
 - Studio com sidebar fixa, formulário de URL, configurações e progresso em tempo real
 - Página de resultados com cards de clipes, score viral e ações de download/preview
 - API: criar jobs, listar, obter, avançar progresso e listar clipes
-- Brand atualizado para Cortes&Recorte
+- Brand atualizado para Corte&Recorte
 - Arquivos de VPS: docker-compose.yml, Dockerfiles e nginx.conf + README
 
 ## Backlog priorizado

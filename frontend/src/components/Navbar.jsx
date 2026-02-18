@@ -18,7 +18,7 @@ export const Navbar = () => {
             className="font-[Outfit] text-xl tracking-tight"
             data-testid="nav-logo-text"
           >
-            Cortes&Recorte
+            Corte&Recorte
           </div>
           <div
             className="text-xs text-[var(--e1-muted)]"

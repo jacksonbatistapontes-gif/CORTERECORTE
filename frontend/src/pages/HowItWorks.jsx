@@ -23,7 +23,7 @@ export default function HowItWorks() {
               Do YouTube aos cortes prontos em quatro etapas.
             </h1>
             <p className="text-white/70" data-testid="how-hero-subtitle">
-              O mesmo fluxo que você espera do Cortes&Recorte, com foco em velocidade,
+              O mesmo fluxo que você espera do Corte&Recorte, com foco em velocidade,
               clareza e aprovação rápida.
             </p>
           </div>
