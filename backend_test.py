@@ -67,7 +67,10 @@ class ClipCutterAPITester:
 
     def test_list_jobs(self):
         """Test listing jobs"""
-        return self.run_test("List Jobs", "GET", "jobs", 200)
+        success, response = self.run_test("List Jobs", "GET", "jobs", 200)
+        if success:
+            print(f"Found {len(response)} jobs")
+        return success
 
     def test_get_job(self):
         """Test getting specific job"""
