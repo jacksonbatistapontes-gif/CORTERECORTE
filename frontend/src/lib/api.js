@@ -32,3 +32,7 @@ export const updateClip = async (jobId, clipId, payload) => {
   const { data } = await axios.patch(`${API}/jobs/${jobId}/clips/${clipId}`, payload);
   return data;
 };
+
+export const getDownloadUrl = (jobId) => {
+  return `${BACKEND_URL || ""}/api/jobs/${jobId}/download`;
+};
