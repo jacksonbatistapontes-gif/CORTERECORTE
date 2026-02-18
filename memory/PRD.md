@@ -13,6 +13,7 @@ crie site para cortes de videos curtos a partir de videos do youtube, com funç�
 - Landing page moderna com hero, CTA, bento grid e prévia de clipes
 - Studio com sidebar fixa, formulário de URL, configurações e progresso em tempo real
 - Página de resultados com cards de clipes, score viral e ações de download/preview
+- Editor manual para ajustar título, legenda e intervalo do corte
 - API: criar jobs, listar, obter, avançar progresso e listar clipes
 - Brand atualizado para Corte&Recorte
 - Arquivos de VPS: docker-compose.yml, Dockerfiles e nginx.conf + README
