@@ -23,8 +23,15 @@ def test_waveform_sprite_features():
             print("❌ No completed jobs found for testing")
             return False
             
-        job = completed_jobs[0]  # Get the most recent completed job
-        job_id = job['id']
+        job_id = completed_jobs[0]['id']  # Get the most recent completed job ID
+        
+        # Get full job details
+        job_response = requests.get(f"{base_url}/api/jobs/{job_id}", timeout=10)
+        if job_response.status_code != 200:
+            print(f"❌ Failed to get job details: {job_response.status_code}")
+            return False
+            
+        job = job_response.json()
         
         print(f"📋 Testing job: {job_id}")
         print(f"   Title: {job.get('title', 'N/A')}")
