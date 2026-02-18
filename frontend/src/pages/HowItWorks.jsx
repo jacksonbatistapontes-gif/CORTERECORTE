@@ -23,8 +23,8 @@ export default function HowItWorks() {
               Do YouTube aos cortes prontos em quatro etapas.
             </h1>
             <p className="text-white/70" data-testid="how-hero-subtitle">
-              O mesmo fluxo que você vê no OpnusClips, com foco em velocidade, clareza e
-              aprovação rápida.
+              O mesmo fluxo que você espera do Cortes&Recorte, com foco em velocidade,
+              clareza e aprovação rápida.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
