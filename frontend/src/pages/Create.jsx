@@ -112,12 +112,20 @@ export default function Create() {
         </div>
         <div className="mt-6 flex flex-col gap-3">
           <div className="glass-card px-4 py-3" data-testid="sidebar-tip-1">
-            <div className="text-xs text-white/50">Dica</div>
-            <div className="text-sm">Use vídeos com áudio claro.</div>
+            <div className="text-xs text-white/50" data-testid="sidebar-tip-1-label">
+              Dica
+            </div>
+            <div className="text-sm" data-testid="sidebar-tip-1-text">
+              Use vídeos com áudio claro.
+            </div>
           </div>
           <div className="glass-card px-4 py-3" data-testid="sidebar-tip-2">
-            <div className="text-xs text-white/50">Foco</div>
-            <div className="text-sm">Cortes entre 25-45s performam melhor.</div>
+            <div className="text-xs text-white/50" data-testid="sidebar-tip-2-label">
+              Foco
+            </div>
+            <div className="text-sm" data-testid="sidebar-tip-2-text">
+              Cortes entre 25-45s performam melhor.
+            </div>
           </div>
         </div>
       </div>
