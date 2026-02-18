@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ClipCard } from "@/components/ClipCard";
 import { ClipEditorDialog } from "@/components/ClipEditorDialog";
 import { ClipPreviewDialog } from "@/components/ClipPreviewDialog";
-import { getJob, getJobClips, updateClip } from "@/lib/api";
+import { getJob, getJobClips, updateClip, getDownloadUrl } from "@/lib/api";
 import { resolveMediaUrl } from "@/lib/media";
 import { toast } from "sonner";
 import { ArrowLeft, DownloadCloud } from "lucide-react";
@@ -81,9 +81,8 @@ export default function Results() {
   }
 
   const handleDownloadAll = () => {
-    toast("Download em lote simulado", {
-      description: "Aqui você baixaria todos os cortes em um pacote.",
-    });
+    const url = getDownloadUrl(jobId);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleDownloadClip = (clip) => {
