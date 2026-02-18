@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ClipCard } from "@/components/ClipCard";
-import { getJob, getJobClips } from "@/lib/api";
+import { ClipEditorDialog } from "@/components/ClipEditorDialog";
+import { getJob, getJobClips, updateClip } from "@/lib/api";
 import { toast } from "sonner";
 import { ArrowLeft, DownloadCloud } from "lucide-react";
 
@@ -17,6 +18,8 @@ export default function Results() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clips, setClips] = useState([]);
+  const [editingClip, setEditingClip] = useState(null);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   useEffect(() => {
     const loadJob = async () => {
@@ -78,6 +81,24 @@ export default function Results() {
       description: "Aqui você baixaria todos os cortes em um pacote.",
     });
   };
+
+  const handleEdit = (clip) => {
+    setEditingClip(clip);
+    setEditorOpen(true);
+  };
+
+  const handleSaveEdit = async (payload) => {
+    try {
+      const updated = await updateClip(jobId, editingClip.id, payload);
+      setClips((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+      toast.success("Ajustes salvos.");
+      setEditorOpen(false);
+    } catch (err) {
+      toast.error("Não foi possível salvar o corte.");
+    }
+  };
+
+  const visibleClips = clips.length > 0 ? clips : job.clips || [];
 
   return (
     <div className="app-shell" data-testid="results-page">
@@ -141,8 +162,8 @@ export default function Results() {
                 </Button>
               </div>
               <div className="clip-grid" data-testid="results-clips-grid">
-                {job.clips.map((clip) => (
-                  <ClipCard key={clip.id} clip={clip} />
+                {visibleClips.map((clip) => (
+                  <ClipCard key={clip.id} clip={clip} onEdit={handleEdit} />
                 ))}
               </div>
             </div>
@@ -150,6 +171,12 @@ export default function Results() {
         </div>
       </main>
       <Footer />
+      <ClipEditorDialog
+        clip={editingClip}
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }
