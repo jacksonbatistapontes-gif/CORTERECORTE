@@ -6,7 +6,7 @@ crie site para cortes de videos curtos a partir de videos do youtube, com funç�
 ## Decisões de arquitetura
 - Frontend: React + Tailwind + shadcn/ui + sonner para toasts
 - Backend: FastAPI + MongoDB (motor)
-- Processamento de cortes é simulado no backend (gera clipes e score)
+- Processamento real com download via yt-dlp + recorte com ffmpeg
 - Pronto para VPS via Docker Compose + Nginx (proxy /api)
 
 ## O que foi implementado
@@ -14,14 +14,15 @@ crie site para cortes de videos curtos a partir de videos do youtube, com funç�
 - Studio com sidebar fixa, formulário de URL, configurações e progresso em tempo real
 - Página de resultados com cards de clipes, score viral e ações de download/preview
 - Editor manual para ajustar título, legenda e intervalo do corte
+- Pipeline real: download YouTube, geração de clipes, thumbnails e URLs de mídia
 - API: criar jobs, listar, obter, avançar progresso e listar clipes
 - Brand atualizado para Corte&Recorte
 - Arquivos de VPS: docker-compose.yml, Dockerfiles e nginx.conf + README
 
 ## Backlog priorizado
 ### P0
-- Integração real com YouTube/IA para corte automático
-- Upload e exportação real dos clipes
+- Aprimorar lógica de detecção de melhores momentos (IA)
+- Processamento em fila e paralelização (para escala)
 
 ### P1
 - Autenticação e histórico por usuário
