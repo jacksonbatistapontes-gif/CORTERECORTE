@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ClipCard } from "@/components/ClipCard";
-import { getJob } from "@/lib/api";
+import { getJob, getJobClips } from "@/lib/api";
 import { toast } from "sonner";
 import { ArrowLeft, DownloadCloud } from "lucide-react";
 
@@ -16,12 +16,19 @@ export default function Results() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [clips, setClips] = useState([]);
 
   useEffect(() => {
     const loadJob = async () => {
       try {
         const data = await getJob(jobId);
         setJob(data);
+        if (data.clip_count > 0 || data.status === "completed") {
+          const clipList = await getJobClips(jobId);
+          setClips(clipList);
+        } else {
+          setClips(data.clips || []);
+        }
       } catch (err) {
         setError("Não encontramos esse processamento.");
       } finally {
