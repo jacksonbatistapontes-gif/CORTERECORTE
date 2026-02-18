@@ -1,34 +1,147 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
-}
-
-.App-header {
-    background-color: #0f0f10;
+.App {
+    background: var(--e1-bg);
+    color: var(--e1-text);
     min-height: 100vh;
+}
+
+.app-shell {
+    position: relative;
+    min-height: 100vh;
+    background: var(--e1-bg);
+    color: var(--e1-text);
+    overflow-x: hidden;
+}
+
+.app-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.section-padding {
+    padding: 5rem 1.5rem;
+}
+
+.hero-surface {
+    position: relative;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+}
+
+.hero-surface::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(10, 10, 10, 0.92), rgba(10, 10, 10, 0.2));
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.glow-orb {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.45), rgba(10, 10, 10, 0));
+    filter: blur(10px);
+    top: -120px;
+    right: -120px;
+    z-index: 0;
+}
+
+.tracing-beam {
+    position: relative;
+    border-radius: 1.5rem;
+    padding: 2px;
+    background: linear-gradient(120deg, #7c3aed, #ccff00, #7c3aed);
+    background-size: 200% 200%;
+    animation: beam 6s linear infinite;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+}
+
+.tracing-beam input {
+    width: 100%;
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 1.125rem;
+    padding: 1.2rem 1.4rem;
+    border-radius: 1.45rem;
+}
+
+.glass-card {
+    background: rgba(17, 17, 17, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(18px);
+    box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.08);
+}
+
+.pill-button {
+    border-radius: 999px;
+    padding: 0.85rem 1.8rem;
+    font-weight: 700;
+}
+
+.sidebar-shell {
+    width: 16rem;
+    background: #0a0a0a;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+    gap: 1rem;
+    z-index: 10;
 }
 
-.App-link {
-    color: #61dafb;
+.dashboard-content {
+    margin-left: 16rem;
+    min-height: 100vh;
+    padding: 3rem 2.5rem 3rem;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
+.clip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.fade-up {
+    animation: fadeUp 0.7s ease both;
+}
+
+@keyframes beam {
+    0% {
+        background-position: 0% 50%;
     }
-    to {
-        transform: rotate(360deg);
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes fadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
