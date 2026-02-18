@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ClipCard } from "@/components/ClipCard";
 import { ClipEditorDialog } from "@/components/ClipEditorDialog";
+import { ClipPreviewDialog } from "@/components/ClipPreviewDialog";
 import { getJob, getJobClips, updateClip } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/media";
 import { toast } from "sonner";
 import { ArrowLeft, DownloadCloud } from "lucide-react";
 
@@ -20,6 +22,8 @@ export default function Results() {
   const [clips, setClips] = useState([]);
   const [editingClip, setEditingClip] = useState(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [previewClip, setPreviewClip] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     const loadJob = async () => {
@@ -82,9 +86,25 @@ export default function Results() {
     });
   };
 
+  const handleDownloadClip = (clip) => {
+    const url = resolveMediaUrl(clip.video_url);
+    if (!url) {
+      toast("Download indisponível", {
+        description: "O corte ainda não possui vídeo gerado.",
+      });
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const handleEdit = (clip) => {
     setEditingClip(clip);
     setEditorOpen(true);
+  };
+
+  const handlePreview = (clip) => {
+    setPreviewClip(clip);
+    setPreviewOpen(true);
   };
 
   const handleSaveEdit = async (payload) => {
@@ -151,7 +171,7 @@ export default function Results() {
             <div className="flex flex-col gap-6" data-testid="results-complete">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="text-white/70" data-testid="results-count">
-                  {job.clip_count} cortes disponíveis
+                {visibleClips.length} cortes disponíveis
                 </div>
                 <Button
                   onClick={handleDownloadAll}
@@ -163,7 +183,13 @@ export default function Results() {
               </div>
               <div className="clip-grid" data-testid="results-clips-grid">
                 {visibleClips.map((clip) => (
-                  <ClipCard key={clip.id} clip={clip} onEdit={handleEdit} />
+                  <ClipCard
+                    key={clip.id}
+                    clip={clip}
+                    onEdit={handleEdit}
+                    onPreview={handlePreview}
+                    onDownload={handleDownloadClip}
+                  />
                 ))}
               </div>
             </div>
@@ -176,6 +202,12 @@ export default function Results() {
         open={editorOpen}
         onOpenChange={setEditorOpen}
         onSave={handleSaveEdit}
+      />
+      <ClipPreviewDialog
+        clip={previewClip}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        onDownload={handleDownloadClip}
       />
     </div>
   );
