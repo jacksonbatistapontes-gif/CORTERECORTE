@@ -1,0 +1,142 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "vibe": "Cyber-Creator / High-Performance / Viral-Tech",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ]
+  },
+  "typography": {
+    "headings": {
+      "family": "Outfit, sans-serif",
+      "weights": ["600", "700", "800"],
+      "usage": "Main headings, hero text, section titles. Use tight tracking (-0.02em)."
+    },
+    "body": {
+      "family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Paragraphs, UI labels, inputs. Use relaxed line-height."
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "usage": "Timestamps, code snippets, viral scores."
+    }
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": {
+        "default": "#0A0A0A",
+        "paper": "#111111",
+        "subtle": "#1A1A1A"
+      },
+      "primary": {
+        "main": "#7C3AED",
+        "hover": "#6D28D9",
+        "foreground": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#CCFF00",
+        "hover": "#B3E600",
+        "foreground": "#000000"
+      },
+      "text": {
+        "primary": "#FFFFFF",
+        "secondary": "#A1A1AA",
+        "muted": "#52525B"
+      },
+      "border": {
+        "default": "#27272A",
+        "active": "#7C3AED"
+      },
+      "status": {
+        "success": "#CCFF00",
+        "error": "#EF4444",
+        "warning": "#F59E0B"
+      }
+    }
+  },
+  "layout": {
+    "spacing": {
+      "base": "0.25rem",
+      "container_padding": "p-6 md:p-12",
+      "section_gap": "gap-12 md:gap-24"
+    },
+    "grid": {
+      "marketing": "grid-cols-1 md:grid-cols-12 gap-8",
+      "dashboard": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+      "bento_rules": [
+        "Hero: col-span-full",
+        "Feature: col-span-4 row-span-1",
+        "Visual: col-span-8 row-span-2"
+      ]
+    },
+    "container": {
+      "max_width": "max-w-7xl mx-auto"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-white rounded-full px-8 py-4 font-bold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(124,58,237,0.5)]",
+      "secondary": "bg-secondary text-black rounded-full px-6 py-3 font-bold hover:bg-secondary/90",
+      "ghost": "text-white/70 hover:text-white hover:bg-white/10 rounded-lg px-4 py-2"
+    },
+    "cards": {
+      "style": "bg-[#111111] border border-white/10 rounded-2xl overflow-hidden hover:border-primary/50 transition-colors",
+      "glass": "bg-black/40 backdrop-blur-xl border border-white/10"
+    },
+    "inputs": {
+      "hero_search": "bg-black/50 border-2 border-white/20 focus:border-primary text-xl p-6 rounded-2xl w-full transition-all shadow-[0_0_40px_rgba(0,0,0,0.5)] placeholder:text-white/20"
+    },
+    "sidebar": {
+      "style": "w-64 bg-[#0A0A0A] border-r border-white/10 h-screen fixed left-0 top-0 p-6 flex flex-col gap-2"
+    }
+  },
+  "visual_enhancers": {
+    "tracing_beam": "Use a moving gradient border on the main input field to signify 'AI Processing'.",
+    "glassmorphism": "Use backdrop-blur-xl on sticky headers and modal overlays. Add a 1px white/10 border.",
+    "gradients": "Avoid full screen gradients. Use subtle radial gradients (purple/blue) in the background to create depth behind the hero section.",
+    "noise": "Add a subtle noise texture overlay (opacity 0.03) to the entire background to prevent banding and add tactility."
+  },
+  "assets": {
+    "hero_bg": "https://images.unsplash.com/photo-1764258559789-40cf1eb2025f?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "creator_happy": "https://images.unsplash.com/photo-1673093774005-a5ee94ed98c4?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "editing_interface": "https://images.unsplash.com/photo-1764557175375-9e2bea91530e?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "podcast_studio": "https://images.unsplash.com/photo-1764664035176-8e92ff4f128e?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "viral_chart": "https://images.unsplash.com/photo-1764258559704-0b7f0f02cae0?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "instructions_to_main_agent": [
+    "Implement the 'Tracing Beam' effect on the main URL input in the Hero section.",
+    "Use the 'Bento Grid' layout for the 'How it Works' section.",
+    "Ensure the Dashboard sidebar is fixed and the main content area scrolls.",
+    "Use the 'Electric Purple' (#7C3AED) for primary actions and 'Neon Lime' (#CCFF00) for high-priority alerts or 'New' badges.",
+    "Simulate the video processing with a progress bar that uses the secondary color.",
+    "The 'Results' page should show a grid of video cards. Each card must have a 'Viral Score' badge (e.g., 92/100) in the top right corner.",
+    "Use 'Outfit' font for all headings. If not available, use a similar geometric sans-serif from Google Fonts.",
+    "Ensure all interactive elements have a hover state that increases brightness or adds a glow."
+  ],
+  "universal_guidelines": [
+    "Do not use generic centered layouts. Use asymmetry where possible.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all.",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters for icons.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports.",
+    "Use sonner for toasts."
+  ]
+}
