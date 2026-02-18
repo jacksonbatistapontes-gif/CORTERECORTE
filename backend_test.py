@@ -198,6 +198,7 @@ class ClipCutterAPITester:
         ("Final Get Job Clips", tester.test_get_job_clips),
         ("Update Clip", tester.test_update_clip),
         ("Verify Updated Clip", tester.test_get_job_clips),
+        ("Test Bulk Download", tester.test_download_job),
     ]
     
     for test_name, test_func in tests:
