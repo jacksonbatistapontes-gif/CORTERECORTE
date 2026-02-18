@@ -154,7 +154,22 @@ export default function Results() {
             </div>
           </div>
 
-          {job.status !== "completed" && (
+          {job.status === "error" && (
+            <div className="glass-card p-6" data-testid="results-error-card">
+              <div className="text-red-300" data-testid="results-error-message">
+                {job.error_message || "Erro ao processar o vídeo."}
+              </div>
+              <Button
+                onClick={() => navigate("/create")}
+                className="pill-button bg-[var(--e1-secondary)] text-black mt-4"
+                data-testid="results-error-retry"
+              >
+                Voltar ao studio
+              </Button>
+            </div>
+          )}
+
+          {job.status !== "completed" && job.status !== "error" && (
             <div className="glass-card p-6 flex flex-col gap-3" data-testid="results-progress">
               <div className="text-sm text-white/70" data-testid="results-progress-text">
                 Seu vídeo ainda está sendo processado. Volte ao studio para acompanhar.
