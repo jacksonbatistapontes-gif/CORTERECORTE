@@ -1,9 +1,12 @@
 from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import asyncio
+import subprocess
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
@@ -15,6 +18,13 @@ import random
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+STORAGE_DIR = ROOT_DIR.parent / "storage"
+VIDEO_DIR = STORAGE_DIR / "videos"
+CLIP_DIR = STORAGE_DIR / "clips"
+
+for path in [VIDEO_DIR, CLIP_DIR]:
+    path.mkdir(parents=True, exist_ok=True)
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
@@ -22,6 +32,7 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+app.mount("/media", StaticFiles(directory=str(STORAGE_DIR)), name="media")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -39,6 +50,7 @@ class ClipSegment(BaseModel):
     viral_score: int
     thumbnail_url: str
     caption: str
+    video_url: str
 
 
 class ClipJob(BaseModel):
@@ -55,6 +67,7 @@ class ClipJob(BaseModel):
     language: str
     style: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    error_message: Optional[str] = None
 
 
 class ClipJobCreate(BaseModel):
@@ -78,33 +91,170 @@ async def root():
 def serialize_job(job: dict) -> ClipJob:
     if isinstance(job.get("created_at"), str):
         job["created_at"] = datetime.fromisoformat(job["created_at"])
+    if isinstance(job.get("clips"), list):
+        job["clips"] = [ClipSegment(**clip) for clip in job.get("clips", [])]
     return ClipJob(**job)
 
+def media_url(path: Path) -> str:
+    rel = path.relative_to(STORAGE_DIR).as_posix()
+    return f"/media/{rel}"
 
-def generate_clips(clip_length: int) -> List[ClipSegment]:
-    thumbnails = [
-        "https://images.unsplash.com/photo-1764557175375-9e2bea91530e?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1764664035176-8e92ff4f128e?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1764258559704-0b7f0f02cae0?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1673093774005-a5ee94ed98c4?crop=entropy&cs=srgb&fm=jpg&q=85",
+
+def run_command(command: List[str]) -> str:
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
+def fetch_video_title(url: str) -> str:
+    try:
+        return run_command(["yt-dlp", "-e", url])
+    except subprocess.CalledProcessError:
+        return "Vídeo do YouTube"
+
+
+def download_video(job_id: str, url: str) -> Path:
+    output_template = VIDEO_DIR / f"{job_id}.%(ext)s"
+    command = [
+        "yt-dlp",
+        "-f",
+        "mp4/best",
+        "--merge-output-format",
+        "mp4",
+        "-o",
+        str(output_template),
+        url,
     ]
-    base_start = random.randint(10, 120)
-    clips: List[ClipSegment] = []
-    for index in range(4):
-        start = base_start + (index * clip_length * 2)
-        end = start + clip_length
-        clips.append(
-            ClipSegment(
-                title=f"Corte viral #{index + 1}",
-                start_time=start,
-                end_time=end,
-                duration=clip_length,
-                viral_score=random.randint(78, 98),
-                thumbnail_url=thumbnails[index % len(thumbnails)],
-                caption="Legenda automática simulada para redes sociais.",
+    run_command(command)
+    return VIDEO_DIR / f"{job_id}.mp4"
+
+
+def get_video_duration(video_path: Path) -> int:
+    output = run_command(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(video_path),
+        ]
+    )
+    return max(1, int(float(output)))
+
+
+def build_clip_plan(duration: int, clip_length: int) -> List[int]:
+    safe_length = min(clip_length, max(5, duration))
+    if duration <= safe_length:
+        return [0]
+    potential = max(1, duration // safe_length)
+    clip_count = min(6, max(3, potential))
+    spacing = (duration - safe_length) / max(1, clip_count - 1)
+    starts = [int(i * spacing) for i in range(clip_count)]
+    return [min(start, max(0, duration - safe_length)) for start in starts]
+
+
+def render_clip(video_path: Path, output_path: Path, start: int, duration: int) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        "ffmpeg",
+        "-y",
+        "-ss",
+        str(start),
+        "-i",
+        str(video_path),
+        "-t",
+        str(duration),
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "23",
+        "-c:a",
+        "aac",
+        "-movflags",
+        "+faststart",
+        str(output_path),
+    ]
+    run_command(command)
+
+
+def render_thumbnail(video_path: Path, output_path: Path, timestamp: int) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        "ffmpeg",
+        "-y",
+        "-ss",
+        str(timestamp),
+        "-i",
+        str(video_path),
+        "-frames:v",
+        "1",
+        "-q:v",
+        "2",
+        str(output_path),
+    ]
+    run_command(command)
+
+
+async def update_job(job_id: str, updates: dict) -> None:
+    await db.clip_jobs.update_one({"id": job_id}, {"$set": updates})
+
+
+async def process_job(job_id: str, url: str, clip_length: int) -> None:
+    try:
+        await update_job(job_id, {"status": "downloading", "progress": 5, "error_message": None})
+        title = await asyncio.to_thread(fetch_video_title, url)
+        await update_job(job_id, {"title": title, "progress": 10})
+        video_path = await asyncio.to_thread(download_video, job_id, url)
+        await update_job(job_id, {"progress": 20, "status": "processing"})
+        duration = await asyncio.to_thread(get_video_duration, video_path)
+        plan = build_clip_plan(duration, clip_length)
+        safe_length = min(clip_length, max(5, duration))
+        clips: List[dict] = []
+        total = len(plan)
+
+        for index, start_time in enumerate(plan):
+            clip_id = str(uuid.uuid4())
+            output_path = CLIP_DIR / job_id / f"{clip_id}.mp4"
+            thumb_path = CLIP_DIR / job_id / f"{clip_id}.jpg"
+            await asyncio.to_thread(render_clip, video_path, output_path, start_time, safe_length)
+            await asyncio.to_thread(render_thumbnail, video_path, thumb_path, min(start_time + 1, duration - 1))
+            end_time = start_time + safe_length
+            viral_score = min(99, 70 + int(((index + 1) / total) * 25))
+            clips.append(
+                ClipSegment(
+                    id=clip_id,
+                    title=f"Corte destacado #{index + 1}",
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration=safe_length,
+                    viral_score=viral_score,
+                    thumbnail_url=media_url(thumb_path),
+                    caption=f"Trecho selecionado de {title}.",
+                    video_url=media_url(output_path),
+                ).model_dump()
             )
-        )
-    return clips
+            await update_job(
+                job_id,
+                {
+                    "progress": 20 + int(((index + 1) / total) * 70),
+                    "clips": clips,
+                    "clip_count": len(clips),
+                },
+            )
+
+        await update_job(job_id, {"status": "completed", "progress": 100, "clips": clips, "clip_count": len(clips)})
+    except Exception as exc:
+        await update_job(job_id, {"status": "error", "error_message": str(exc), "progress": 0})
 
 
 @api_router.post("/jobs", response_model=ClipJob)
