@@ -54,10 +54,7 @@ export const ClipCard = ({ clip, onPreview, onDownload }) => {
         <p className="text-sm text-white/60" data-testid={`clip-caption-${clip.id}`}>
           {clip.caption}
         </p>
-        <div
-          className="text-xs font-[JetBrains_Mono] text-white/50"
-          data-testid={`clip-timestamp-${clip.id}`}
-        >
+        <div className="text-xs font-mono text-white/50" data-testid={`clip-timestamp-${clip.id}`}>
           {clip.start_time}s → {clip.end_time}s · {clip.duration}s
         </div>
       </div>
