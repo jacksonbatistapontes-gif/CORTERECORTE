@@ -89,7 +89,13 @@ class ClipCutterAPITester:
         if not self.job_id:
             print("❌ No job ID available for testing")
             return False
-        return self.run_test("Get Job Clips", "GET", f"jobs/{self.job_id}/clips", 200)
+        success, response = self.run_test("Get Job Clips", "GET", f"jobs/{self.job_id}/clips", 200)
+        if success and response:
+            # Store first clip ID for update testing
+            if len(response) > 0:
+                self.clip_id = response[0].get('id')
+                print(f"Found clip ID for testing: {self.clip_id}")
+        return success
 
     def test_advance_to_completion(self):
         """Test advancing job until completion"""
