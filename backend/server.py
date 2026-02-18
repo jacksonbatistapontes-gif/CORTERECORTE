@@ -7,6 +7,7 @@ import os
 import logging
 import asyncio
 import subprocess
+import sys
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
@@ -112,7 +113,7 @@ def run_command(command: List[str]) -> str:
 
 def fetch_video_title(url: str) -> str:
     try:
-        return run_command(["yt-dlp", "-e", url])
+        return run_command([sys.executable, "-m", "yt_dlp", "-e", url])
     except subprocess.CalledProcessError:
         return "Vídeo do YouTube"
 
@@ -120,7 +121,9 @@ def fetch_video_title(url: str) -> str:
 def download_video(job_id: str, url: str) -> Path:
     output_template = VIDEO_DIR / f"{job_id}.%(ext)s"
     command = [
-        "yt-dlp",
+        sys.executable,
+        "-m",
+        "yt_dlp",
         "-f",
         "mp4/best",
         "--merge-output-format",
