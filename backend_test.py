@@ -128,6 +128,26 @@ class ClipCutterAPITester:
         print(f"❌ Job did not complete after {max_attempts} attempts")
         return False
 
+    def test_update_clip(self):
+        """Test updating a clip"""
+        if not self.job_id or not self.clip_id:
+            print("❌ No job ID or clip ID available for testing")
+            return False
+        
+        update_data = {
+            "title": "Corte editado manualmente",
+            "caption": "Nova legenda após edição manual",
+            "start_time": 15,
+            "end_time": 45
+        }
+        
+        success, response = self.run_test("Update Clip", "PATCH", f"jobs/{self.job_id}/clips/{self.clip_id}", 200, update_data)
+        if success:
+            print(f"Updated clip title: {response.get('title', 'N/A')}")
+            print(f"Updated clip duration: {response.get('duration', 'N/A')}s")
+            print(f"Updated clip time range: {response.get('start_time', 'N/A')}s → {response.get('end_time', 'N/A')}s")
+        return success
+
 def main():
     print("🚀 Starting ClipCutter API Tests")
     print("=" * 50)
