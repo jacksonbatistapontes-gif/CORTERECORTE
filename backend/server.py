@@ -129,7 +129,23 @@ async def create_job(payload: ClipJobCreate):
 
 @api_router.get("/jobs", response_model=List[ClipJob])
 async def list_jobs():
-    jobs = await db.clip_jobs.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    jobs = await db.clip_jobs.find(
+        {},
+        {
+            "_id": 0,
+            "id": 1,
+            "title": 1,
+            "status": 1,
+            "progress": 1,
+            "clip_count": 1,
+            "clip_length": 1,
+            "youtube_url": 1,
+            "created_at": 1,
+            "clips": 1,
+            "language": 1,
+            "style": 1,
+        },
+    ).sort("created_at", -1).to_list(100)
     return [serialize_job(job) for job in jobs]
 
 
@@ -143,7 +159,7 @@ async def get_job(job_id: str):
 
 @api_router.get("/jobs/{job_id}/clips", response_model=List[ClipSegment])
 async def get_job_clips(job_id: str):
-    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
+    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0, "clips": 1})
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     return [ClipSegment(**clip) for clip in job.get("clips", [])]
@@ -151,7 +167,10 @@ async def get_job_clips(job_id: str):
 
 @api_router.post("/jobs/{job_id}/advance", response_model=ClipJob)
 async def advance_job(job_id: str):
-    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
+    job = await db.clip_jobs.find_one(
+        {"id": job_id},
+        {"_id": 0, "progress": 1, "status": 1, "clips": 1, "clip_length": 1},
+    )
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     progress = job.get("progress", 0)
@@ -173,7 +192,7 @@ async def advance_job(job_id: str):
 
 @api_router.patch("/jobs/{job_id}/clips/{clip_id}", response_model=ClipSegment)
 async def update_clip(job_id: str, clip_id: str, payload: ClipUpdate):
-    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0})
+    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0, "clips": 1})
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     clips = job.get("clips", [])
