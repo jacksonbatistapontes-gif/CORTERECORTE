@@ -19,6 +19,10 @@ http://SEU_IP_DA_VPS:3000
 
 O frontend já está configurado para consumir o backend via `/api`, com proxy do Nginx.
 
+## Processamento real de vídeos
+- O backend baixa o vídeo do YouTube via **yt-dlp** e recorta com **ffmpeg**.
+- Os arquivos gerados ficam em `/app/storage` (montado como volume no Docker).
+
 ## Serviços expostos
 - Frontend: porta **3000**
 - Backend: porta **8001**
