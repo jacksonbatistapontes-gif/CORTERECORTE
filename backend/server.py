@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,6 +9,7 @@ import logging
 import asyncio
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
@@ -317,6 +319,31 @@ async def get_job_clips(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     return [ClipSegment(**clip) for clip in job.get("clips", [])]
+
+
+@api_router.get("/jobs/{job_id}/download")
+async def download_job(job_id: str):
+    job = await db.clip_jobs.find_one({"id": job_id}, {"_id": 0, "clips": 1})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job não encontrado")
+    clips = job.get("clips", [])
+    if not clips:
+        raise HTTPException(status_code=400, detail="Nenhum corte disponível")
+    zip_path = CLIP_DIR / job_id / "cortes.zip"
+    zip_path.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+        for clip in clips:
+            video_url = clip.get("video_url", "")
+            thumb_url = clip.get("thumbnail_url", "")
+            if video_url:
+                video_path = STORAGE_DIR / video_url.replace("/media/", "")
+                if video_path.exists():
+                    zipf.write(video_path, arcname=f"clips/{video_path.name}")
+            if thumb_url:
+                thumb_path = STORAGE_DIR / thumb_url.replace("/media/", "")
+                if thumb_path.exists():
+                    zipf.write(thumb_path, arcname=f"thumbs/{thumb_path.name}")
+    return FileResponse(zip_path, filename=f"cortes-{job_id}.zip")
 
 
 @api_router.post("/jobs/{job_id}/advance", response_model=ClipJob)
