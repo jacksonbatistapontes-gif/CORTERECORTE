@@ -54,7 +54,7 @@ class ClipCutterAPITester:
     def test_create_job(self):
         """Test job creation"""
         job_data = {
-            "youtube_url": "https://youtube.com/watch?v=test123",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",  # Rick Roll - short, reliable video
             "clip_length": 30,
             "language": "pt",
             "style": "dinamico"
