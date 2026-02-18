@@ -3,7 +3,9 @@ FROM node:18-alpine AS build
 WORKDIR /app
 
 COPY package.json ./
-RUN yarn install
+RUN apk add --no-cache python3 make g++
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
+RUN yarn install --network-timeout 600000
 
 COPY . ./
 
