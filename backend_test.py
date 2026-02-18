@@ -151,7 +151,36 @@ class ClipCutterAPITester:
             print(f"Updated clip time range: {response.get('start_time', 'N/A')}s → {response.get('end_time', 'N/A')}s")
         return success
 
-def main():
+    def test_download_job(self):
+        """Test bulk download functionality"""
+        if not self.job_id:
+            print("❌ No job ID available for testing")
+            return False
+        
+        url = f"{self.base_url}/api/jobs/{self.job_id}/download"
+        print(f"\n🔍 Testing Bulk Download...")
+        print(f"URL: {url}")
+        
+        try:
+            response = requests.get(url, timeout=30)
+            success = response.status_code == 200
+            
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                print(f"Content-Type: {response.headers.get('content-type', 'N/A')}")
+                print(f"Content-Length: {len(response.content)} bytes")
+                return True
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                print(f"Response: {response.text[:200]}...")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+        finally:
+            self.tests_run += 1
     print("🚀 Starting ClipCutter API Tests")
     print("=" * 50)
     
