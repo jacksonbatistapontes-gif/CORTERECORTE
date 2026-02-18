@@ -68,6 +68,9 @@ class ClipJob(BaseModel):
     clip_length: int
     language: str
     style: str
+    duration: Optional[int] = None
+    waveform_url: Optional[str] = None
+    sprite_url: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     error_message: Optional[str] = None
 
@@ -219,6 +222,41 @@ def render_thumbnail(video_path: Path, output_path: Path, timestamp: int) -> Non
     run_command(command)
 
 
+def render_waveform(video_path: Path, output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(video_path),
+        "-filter_complex",
+        "aformat=channel_layouts=mono,showwavespic=s=1200x200:colors=ccff00",
+        "-frames:v",
+        "1",
+        str(output_path),
+    ]
+    run_command(command)
+
+
+def render_sprite(video_path: Path, output_path: Path, duration: int) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    frame_count = min(8, max(4, max(1, duration // 6)))
+    fps = frame_count / max(1, duration)
+    filter_value = f"fps={fps},scale=200:-1,tile={frame_count}x1"
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(video_path),
+        "-vf",
+        filter_value,
+        "-frames:v",
+        "1",
+        str(output_path),
+    ]
+    run_command(command)
+
+
 async def update_job(job_id: str, updates: dict) -> None:
     await db.clip_jobs.update_one({"id": job_id}, {"$set": updates})
 
@@ -231,6 +269,18 @@ async def process_job(job_id: str, url: str, clip_length: int) -> None:
         video_path = await asyncio.to_thread(download_video, job_id, url)
         await update_job(job_id, {"progress": 20, "status": "processing"})
         duration = await asyncio.to_thread(get_video_duration, video_path)
+        waveform_path = CLIP_DIR / job_id / "waveform.png"
+        sprite_path = CLIP_DIR / job_id / "sprite.jpg"
+        await asyncio.to_thread(render_waveform, video_path, waveform_path)
+        await asyncio.to_thread(render_sprite, video_path, sprite_path, duration)
+        await update_job(
+            job_id,
+            {
+                "duration": duration,
+                "waveform_url": media_url(waveform_path),
+                "sprite_url": media_url(sprite_path),
+            },
+        )
         plan = build_clip_plan(duration, clip_length)
         safe_length = min(clip_length, max(5, duration))
         clips: List[dict] = []
