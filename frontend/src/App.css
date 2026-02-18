@@ -12,6 +12,11 @@
     overflow-x: hidden;
 }
 
+.app-shell > * {
+    position: relative;
+    z-index: 1;
+}
+
 .app-shell::before {
     content: "";
     position: fixed;
